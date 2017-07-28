@@ -20,12 +20,12 @@
  <body>
 
 <script type="text/javascript">  
-    $("bLoad").click(function(){
-        $(this).button('loading').delay(1000).queue(function(){
-            $(this).button('reset');
-            $(this).dequeue();
-        });        
-    });
+
+function bLoad() {
+   var text = document.getElementById("bLoad").firstChild;
+   text.data = "Searching";
+}
+
 </script>
 
 <?php
@@ -35,40 +35,54 @@ function scanBlue(){
         $cmd = "hcitool scan";
         $result = shell_exec($cmd);
 
-	echo "<center>Selecione o dispositivo</br>";
+	echo "<center>";
 
 	$list = explode('	', $result);
 
-//	echo "<center><div class=\"list-group\">";
 
-	echo  "<form action=\"paring.php\" method=\"post\" ><select name=\"mac\" >";
+	echo  "<form action=\"paring.php\" method=\"post\">";
 
-	$n = count($list);
+	        echo  "<div class=\"form-group\">";
 
-	for($i=1; $i < $n; $i=$i+2){
-//		print($list[i] . "    " . $list[$i+1] . "</br>" ); 
-		echo  "<option value=\"" . $list[$i] . "\">" . $list[$i+1] . "</option>";
-//		  echo "<a href=\"./&op=cc&mac=" . $list[$i] . "&auth=6779\" class=\"list-group-item\">" .  $list[$i+1] . "</a></br>";
-	} 
-	echo "</select></br>PIN Code</br>";
+ 	        	echo "<label for=\"mac\">Selecione o dispositivo</label>";
+
+        	        echo "<select class=\"form-control\" id=\"mac\" name=\"mac\" style=\"width:350px;\">";
+
+
+			$n = count($list);
+
+			for($i=1; $i < $n; $i=$i+2){
+				echo  "<option value=\"" . $list[$i] . "\">" . $list[$i+1] . "</option>";
+			} 
+		
+			echo "</select></br>";
+
+		echo "</div>";
+
 	
-
-	echo "<input type=\"hidden\" name=\"op\" value=\"cc\">";
+		echo "<input type=\"hidden\" name=\"op\" value=\"cc\">";
  
-	echo "<input type=\"text\" name=\"pin\"><br>";
+		echo "<div class=\"form-group\">";
+			echo "<label for=\"pin\">PIN Code:</label>";
+			echo "<input type=\"text\" class=\"form-control\" id=\"pin\" name=\"pin\" style=\"width:100px;\">";
+		echo "</div>";
 
-	echo "<input type=\"submit\" value=\"Conectar\">";
+        echo "<button type=\"submit\" class=\"btn btn-default\">Conectar</button>";
 
 	echo "</form></center>";
 
-//	echo "</div></center>";
 
        }
 
 function connectBlue($mac,$pin){
   	 $cmd = "./paring.sh paring " . $mac . " " . $pin . " | bluetoothctl";
 	 $result = shell_exec($cmd);
-  	 print($result);
+//         print($cmd . "</br>");
+
+//	 $cmd = "./paring.sh parieds | bluetoothctl";
+//         $result = shell_exec($cmd);
+//	 $result = str_replace("[0","</br>",$result);
+  //	 print($result);
 }
 
 function get_string_between($string, $start, $end){
@@ -149,7 +163,7 @@ function get_paried_devices(){
 
 		 <div class="form-group">
 			  <button class="btn btn-primary">Refresh</button>
-			  <button name="op" value="sc" class="btn btn-primary" id="bLoad">Adicionar</button>
+			  <button name="op" value="sc" class="btn btn-primary" id="bLoad" onclick="bLoad()">Adicionar</button>
 			  <button name="op" value="rm" class="btn btn-primary">Remover</button>
 			  <button name="op" value="esp" class="btn btn-primary">Enable Serial</button>
   		 </div> 
