@@ -2,6 +2,8 @@
  <head>
   <title>BlueWman</title>
 
+  <title>Bootstrap Example</title>
+
   <meta charset="utf-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,12 +22,14 @@
  <body>
 
 <script type="text/javascript">  
-    $("bLoad").click(function(){
+$(document).ready(function(){ 
+    $(".btn").click(function(){
         $(this).button('loading').delay(1000).queue(function(){
             $(this).button('reset');
             $(this).dequeue();
         });        
     });
+});   
 </script>
 
 <?php
@@ -91,8 +95,6 @@ function get_paried_devices(){
  	 $teste = str_replace("Device ","",$teste);
 	 $list_temp = explode("\n",$teste);
 
-	 array_pop($list_temp);
-
  	 $list = [];
 
 	 foreach($list_temp as $dev_temp){
@@ -101,93 +103,75 @@ function get_paried_devices(){
 		$device =  array( "mac"  => $temp[0], "name" => $temp[1]);
 
 		array_push($list,$device);
+
 	}
 
+	foreach($list as $device){
+		echo $device['mac'] . " " . $device['name'] . "</br>";
+	}
 
 	return $list;
 
 }
 
+	switch($_POST['op']){
+			case 'sc': echo "</br>";
+				scanBlue();
+ 				break;
+			case 'cc':
+				connectBlue($_POST['mac'],$_POST['pin']);
+				break;
+			case 'rm':
+				$cmd =  "./paring.sh remove 20:14:05:21:34:67 | bluetoothctl";
+				$result = shell_exec($cmd);
+				echo $result;
+			
+				break;
+			case 'esp':
+                                $cmd =  "rfcomm connect /dev/rfcomm0 " . $_POST['mac'] . " &";
+                                $result = shell_exec($cmd);
+                                echo $result;
+                                break;
+
+	}
 
 
 ?>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <center>
 
 	<h1>Bluetooth Web Manager</h1>
 
+	</br>Paired Devices</br>
+        <form action="" method="post">
 
+		<select name="mac" size=5 >
 
-        <form action="paring.php" method="post">
+		<?php $list_devs = get_paried_devices();
 
-		<?php 
-		   
-		   $list_devs = get_paried_devices();
+  	           foreach($list_devs as $device){
+	                echo  "<option value=\"" . $device['mac'] . "\">" . $device['name'] . "</option>";
+	           }
 
-		   if(count($list_devs) > 0){
 		?>
 
+	        </select></br>
 
-			 <div class="form-group">
+	    <input type="button" value="Refresh Page" onClick="window.location.reload()"><br>
 
-                        <label for="mac">Dispositivo pareados</label>
-                        <select class="form-control" id="mac" name="mac" style="width:350px;">
+	    <button class="buttonload"><i class="fa fa-spinner fa-spin" name="op" value="sc"></i>Searching</button></br>
 
-			<?php 
-	  	           foreach($list_devs as $device){
-		                echo  "<option value=\"" . $device['mac'] . "\">" . $device['name'] . "</option>";
-	        	   }
-			?>
+            <button type="button" class="btn btn-primary btn-lg"  name="op" value="sc">Searching </button></br>
 
-			 </select></br>	
+	    <button type="button" class="btn btn-primary btn-lg " id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Processing Order">Submit Order</button>
+	    <br>
 
-	                </div>	
-	<?php   } ?>
-
-
-		 <div class="form-group">
-			  <button class="btn btn-primary">Refresh</button>
-			  <button name="op" value="sc" class="btn btn-primary" id="bLoad">Adicionar</button>
-			  <button name="op" value="rm" class="btn btn-primary">Remover</button>
-			  <button name="op" value="esp" class="btn btn-primary">Enable Serial</button>
-  		 </div> 
-
-
+            <button name="op" value="sc" class="buttonload">Adicionar</button></br>
+	    <button name="op" value="rm">Remover</button></br>
+	    <button name="op" value="esp">Enable Serial</button></br>
+	    <button name="op" value="dsp">Disable Serial</button></br>
         </form>
-
-	</br>
-
-        <?php
-
-	 switch($_POST['op']){
-                        case 'sc': echo "</br>";
-                                scanBlue();
-                                break;
-                        case 'cc':
-                                connectBlue($_POST['mac'],$_POST['pin']);
-                                break;
-                        case 'rm':
-                                $cmd =  "./paring.sh remove " . $_POST['mac'] . " | bluetoothctl";
-//				echo $cmd . "</br>";
-                                $result = shell_exec($cmd);
-//                                echo $result;
-
-                                break;
-                        case 'esp':
-                                $cmd =  "rfcomm connect /dev/rfcomm0 " . $_POST['mac'] . " &";
-                                $result = shell_exec($cmd);
-                                echo $result;
-                                break;
-
-        }
-
-
-	?>
-
-
-
 
 </center>
  </body>
